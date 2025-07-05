@@ -11,6 +11,14 @@
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <!-- Babel for JSX support -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Confetti library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script>
+      // Ensure confetti is available globally
+      window.confetti = window.confetti || function() {
+        console.log('Confetti fallback - library not loaded');
+      };
+    </script>
   </head>
   <body class="bg-gradient-to-br from-blue-100 to-purple-200 min-h-screen flex flex-col items-center justify-center">
     <div id="root" class="w-full max-w-2xl mx-auto p-4"></div>
@@ -97,6 +105,24 @@
           [arr[i], arr[j]] = [arr[j], arr[i]];
         }
         return arr;
+      }
+
+      function triggerConfetti() {
+        // Create a colorful confetti burst from the top of the screen
+        if (typeof window.confetti !== 'undefined') {
+          window.confetti({
+            particleCount: 500,
+            spread: 110,
+            origin: { y: 0 },
+            colors: ['#6366f1', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#ef4444', '#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57', '#ff9ff3', '#54a0ff', '#5f27cd', '#00d2d3', '#ff9f43'],
+            gravity: 1.5,
+            ticks: 160,
+            startVelocity: 30,
+            decay: 0.9
+          });
+        } else {
+          console.log('Confetti library not loaded');
+        }
       }
 
       function fractionValue(f) {
@@ -226,6 +252,7 @@
           const isCorrect = fractions.every((f, i) => f.numerator === sorted[i].numerator && f.denominator === sorted[i].denominator);
           if (isCorrect) {
             setFeedback('correct');
+            triggerConfetti();
             setTimeout(() => {
               setQuestionIdx((q) => (q + 1) % FRACTIONS.length);
             }, 1800);
@@ -238,13 +265,14 @@
           <div className="flex flex-col items-center w-full">
             <h1 className="text-3xl font-extrabold text-indigo-700 mb-2 text-center drop-shadow">4th Grade Fractions Practice</h1>
             <p className="mb-6 text-gray-700 text-center">Drag the cards to order the fractions from smallest to largest. Use the pie chart hint if you need help!</p>
-            <div className="mb-4">
+            <div className="mb-4 flex gap-2">
               <button
                 className="px-4 py-2 bg-purple-600 text-white rounded-lg shadow hover:bg-purple-700 transition text-sm font-semibold"
                 onClick={handleToggleAllHints}
               >
                 {hintIndices.size === fractions.length ? 'Hide All Hints' : 'Show All Hints'}
               </button>
+
             </div>
             <div className="flex flex-row gap-4 mb-8 w-full justify-center">
               {fractions.map((f, i) => (
